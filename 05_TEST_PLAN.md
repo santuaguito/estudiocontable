@@ -41,6 +41,25 @@
 - [ ] Porcentajes fuera de rango bloqueados según regla configurable.
 
 ## D. Liquidación
+- [ ] Con perfil completo CCT 130/75, crear un borrador de noviembre 2026 y contrastar categoría, básico, antigüedad, presentismo, suma periódica y suma única contra la escala FAECYS Acuerdo 10/2026.
+- [ ] Verificar que la suma única no reciba antigüedad ni presentismo, que las sumas no remunerativas recurrentes sí reciban ambos cuando corresponda y que jornada parcial se prorratee.
+- [ ] Comprobar tasas sindicales/solidarias configurables, deducciones personales, alícuotas ARCA/FAL/ART y snapshot inmutable al editar el legajo posteriormente.
+- [ ] Confirmar FAL en cero antes del período 12/2026 y según alícuota configurada desde ese período.
+- [ ] Verificar RIFL solo con confirmación individual, fecha de ingreso dentro de 01/05/2026–30/04/2027 y ventana menor a 48 meses; confirmar que su desglose patronal no reduce la tasa FAL.
+- [ ] Eliminar un recibo individual de un período borrador con más de una persona; confirmar que los demás recibos permanecen y que la acción se audita.
+- [ ] Eliminar el período borrador completo; confirmar que se borran sus conceptos y recibos, que la acción se audita y que un período en revisión no puede eliminarse.
+- [ ] Verificar que contador/propietario pueda aceptar un recibo en borrador o revisión, que se registren usuario y fecha, y que el recibo quede bloqueado.
+- [ ] Confirmar que el período solo figure finalizado cuando todos sus recibos estén aprobados y que el PDF aprobado se descargue como final.
+- [ ] Confirmar que un miembro sin rol contador/propietario no pueda aprobar aunque llame directamente al RPC.
+- [ ] Bloquear períodos fuera de noviembre 2026–mayo 2027 o legajos sin categoría aplicable.
+- [ ] Revisar bases imponibles, topes, excepciones y totales del recibo con un contador matriculado antes de cualquier uso legal.
+- [ ] Cambiar categoría o tasas del legajo no altera los conceptos ni snapshot de borradores existentes.
+- [ ] Período con servicio de sueldos crea recibos borrador para personas activas.
+- [ ] Período duplicado o empresa sin personal activo se rechaza.
+- [ ] El recibo no admite agregar importes arbitrarios; solo se editan tasas de sindicato y solidaridad en el perfil.
+- [ ] Solicitar revisión bloquea recibos y sus conceptos.
+- [ ] Impresión conserva la marca de borrador y advertencia de no emisión.
+- [ ] Gráfico informativo representa proporciones de los costos patronales estimados con parámetros empresariales.
 - [ ] Período obligatorio y único.
 - [ ] Conceptos con base/porcentaje calculan según regla versionada.
 - [ ] Redondeo consistente.

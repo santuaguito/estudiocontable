@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatIdentifier, isValidCuil, isValidTaxId, validateCompany, validateEmployee } from "./domain";
+import { formatIdentifier, isValidCuil, isValidTaxId, parseBaseSalary, validateCompany, validateEmployee } from "./domain";
 
 describe("identificadores argentinos", () => {
   it("normaliza el formato sin cambiar los dígitos", () => {
@@ -21,10 +21,20 @@ describe("identificadores argentinos", () => {
       cuil: "20000000001",
       category: "Administrativa",
       startDate: "2026-01-10",
+      baseSalary: 0,
     };
     expect(validateEmployee(input, ["20-00000000-1"])).toContain(
       "Ya existe una persona con ese CUIL.",
     );
+  });
+});
+
+describe("sueldo básico del legajo", () => {
+  it("parsea importes argentinos y limita a dos decimales", () => {
+    expect(parseBaseSalary("1.234.567,89")).toBe(1234567.89);
+    expect(parseBaseSalary("0")).toBe(0);
+    expect(parseBaseSalary("-1")).toBeNull();
+    expect(parseBaseSalary("12,345")).toBeNull();
   });
 });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import {
   Company,
@@ -55,6 +56,7 @@ function mapEmployee(row: EmployeeRow): Employee {
     cuil: row.cuil,
     category: row.category,
     startDate: row.start_date,
+    baseSalary: Number(row.base_salary),
     active: row.active,
   };
 }
@@ -225,6 +227,7 @@ export default function Home() {
       cuil: String(data.get("cuil") ?? ""),
       category: String(data.get("category") ?? ""),
       startDate: String(data.get("startDate") ?? ""),
+      baseSalary: 0,
     };
     const errors = validateEmployee(input, employees.map((employee) => employee.cuil));
     if (errors.length) {
@@ -239,6 +242,7 @@ export default function Home() {
       cuil: digitsOnly(input.cuil),
       category: input.category.trim(),
       start_date: input.startDate,
+      base_salary: input.baseSalary,
     }).select("*").single();
     if (error || !row) {
       setEmployeeError(error?.code === "23505" ? "Ya existe una persona con ese CUIL en esta empresa." : "No pudimos guardar la persona. Revisá la conexión y los permisos.");
@@ -250,15 +254,16 @@ export default function Home() {
     form.reset();
   }
 
-  async function archiveCompany(companyId: string) {
+  async function setCompanyActive(companyId: string, active: boolean) {
     if (!supabase || !studioId) return;
-    const { error } = await supabase.from("companies").update({ active: false }).eq("id", companyId).eq("studio_id", studioId);
+    if (!active && !window.confirm("¿Querés archivar esta empresa? Podrás reactivarla después.")) return;
+    const { error } = await supabase.from("companies").update({ active }).eq("id", companyId).eq("studio_id", studioId);
     if (error) {
-      setDataError("No pudimos archivar la empresa.");
+      setDataError(active ? "No pudimos reactivar la empresa." : "No pudimos archivar la empresa.");
       return;
     }
-    setCompanies((current) => current.map((company) => company.id === companyId ? { ...company, active: false } : company));
-    if (selectedCompanyId === companyId) setSelectedCompanyId(null);
+    setCompanies((current) => current.map((company) => company.id === companyId ? { ...company, active } : company));
+    if (!active && selectedCompanyId === companyId) setSelectedCompanyId(null);
   }
 
   if (!supabase) {
@@ -287,9 +292,6 @@ export default function Home() {
         <div className="nav-label">ESPACIO DE TRABAJO</div>
         <nav aria-label="Navegación principal">
           <a className="nav-item active" href="#empresas"><span>▦</span> Empresas <span className="nav-count">{companies.length}</span></a>
-          <a className="nav-item disabled" href="#sueldos" aria-disabled="true"><span>▤</span> Sueldos <span className="soon">Próximo</span></a>
-          <a className="nav-item disabled" href="#contabilidad" aria-disabled="true"><span>◫</span> Contabilidad <span className="soon">Próximo</span></a>
-          <a className="nav-item disabled" href="#reportes" aria-disabled="true"><span>▧</span> Reportes</a>
         </nav>
         <div className="sidebar-bottom">
           <div className="profile-avatar">SC</div>
@@ -326,8 +328,8 @@ export default function Home() {
             <div className="companies-panel"><table><thead><tr><th>EMPRESA</th><th>SERVICIO</th><th>CIERRE</th><th>PERSONAS</th><th>ESTADO</th><th><span className="sr-only">Acciones</span></th></tr></thead><tbody>{visibleCompanies.map((company) => {
               const count = employees.filter((employee) => employee.companyId === company.id).length;
               return <tr key={company.id} className={selectedCompanyId === company.id ? "selected-row" : ""}>
-                <td><button className="company-cell" onClick={() => setSelectedCompanyId(company.id)}><span className="company-avatar">{company.legalName.slice(0, 1).toUpperCase()}</span><span><strong>{company.legalName}</strong><small>{formatIdentifier(company.taxId)}</small></span></button></td>
-                <td><span className="service-tag">{serviceLabels[company.serviceType]}</span></td><td>{company.fiscalYearEnd ? new Date(`${company.fiscalYearEnd}T12:00:00`).toLocaleDateString("es-AR", { day: "2-digit", month: "short" }) : "—"}</td><td>{count} {count === 1 ? "persona" : "personas"}</td><td><span className={`status ${company.active ? "status-active" : "status-inactive"}`}><i />{company.active ? "Activa" : "Archivada"}</span></td><td><button className="row-menu" aria-label={`Archivar ${company.legalName}`} onClick={() => archiveCompany(company.id)}>•••</button></td>
+                <td><Link className="company-cell" href={`/companies/${company.id}`}><span className="company-avatar">{company.legalName.slice(0, 1).toUpperCase()}</span><span><strong>{company.legalName}</strong><small>{formatIdentifier(company.taxId)}</small></span></Link></td>
+                <td><span className="service-tag">{serviceLabels[company.serviceType]}</span></td><td>{company.fiscalYearEnd ? new Date(`${company.fiscalYearEnd}T12:00:00`).toLocaleDateString("es-AR", { day: "2-digit", month: "short" }) : "—"}</td><td>{count} {count === 1 ? "persona" : "personas"}</td><td><span className={`status ${company.active ? "status-active" : "status-inactive"}`}><i />{company.active ? "Activa" : "Archivada"}</span></td><td><button className="row-action" aria-label={`${company.active ? "Archivar" : "Reactivar"} ${company.legalName}`} onClick={() => void setCompanyActive(company.id, !company.active)}>{company.active ? "Archivar" : "Reactivar"}</button></td>
               </tr>;
             })}</tbody></table></div>
           )}
@@ -342,7 +344,7 @@ export default function Home() {
 
       {companyOpen && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setCompanyOpen(false); }}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="company-title"><div className="modal-heading"><div><div className="eyebrow">NUEVO REGISTRO</div><h2 id="company-title">Agregar empresa</h2><p>Completá la información principal de la empresa.</p></div><button className="icon-button" aria-label="Cerrar" onClick={() => setCompanyOpen(false)}>×</button></div><form onSubmit={createCompany} noValidate><label>Razón social<input name="legalName" autoFocus placeholder="Ej. Empresa de prueba S.A." /></label><label>CUIT<input name="taxId" inputMode="numeric" placeholder="30-00000000-0" /></label><label>Domicilio fiscal<input name="address" placeholder="Calle, número, localidad" /></label><label>Servicio<select name="serviceType" defaultValue="LIQUIDACION_SUELDOS"><option value="LIQUIDACION_SUELDOS">Liquidación de sueldos</option><option value="BALANCE">Balance</option><option value="AMBOS">Sueldos y balance</option></select></label><label>Fecha de cierre del ejercicio <span className="optional">Requerida para balance</span><input name="fiscalYearEnd" type="date" /></label>{companyError && <p className="form-error" role="alert">{companyError}</p>}<div className="form-actions"><button type="button" className="secondary-button" onClick={() => setCompanyOpen(false)}>Cancelar</button><button className="primary-button" type="submit">Guardar empresa</button></div></form></section></div>}
 
-      {employeeOpen && selectedCompany && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setEmployeeOpen(false); }}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="employee-title"><div className="modal-heading"><div><div className="eyebrow">{selectedCompany.legalName}</div><h2 id="employee-title">Agregar persona</h2><p>Registrá datos básicos del equipo.</p></div><button className="icon-button" aria-label="Cerrar" onClick={() => setEmployeeOpen(false)}>×</button></div><form onSubmit={createEmployee} noValidate><label>Nombre y apellido<input name="fullName" autoFocus placeholder="Ej. Nombre de prueba" /></label><label>CUIL<input name="cuil" inputMode="numeric" placeholder="20-00000000-0" /></label><label>Categoría o calificación<input name="category" placeholder="Ej. Administrativa" /></label><label>Fecha de ingreso<input name="startDate" type="date" /></label>{employeeError && <p className="form-error" role="alert">{employeeError}</p>}<div className="form-actions"><button type="button" className="secondary-button" onClick={() => setEmployeeOpen(false)}>Cancelar</button><button className="primary-button" type="submit">Guardar persona</button></div></form></section></div>}
+      {employeeOpen && selectedCompany && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setEmployeeOpen(false); }}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="employee-title"><div className="modal-heading"><div><div className="eyebrow">{selectedCompany.legalName}</div><h2 id="employee-title">Agregar persona</h2><p>Registrá los datos básicos. Completá el perfil CCT 130/75 desde la ficha de la empresa.</p></div><button className="icon-button" aria-label="Cerrar" onClick={() => setEmployeeOpen(false)}>×</button></div><form onSubmit={createEmployee} noValidate><label>Nombre y apellido<input name="fullName" autoFocus placeholder="Ej. Nombre de prueba" /></label><label>CUIL<input name="cuil" inputMode="numeric" placeholder="20-00000000-0" /></label><label>Categoría o calificación<input name="category" placeholder="Ej. Administrativa" /></label><label>Fecha de ingreso<input name="startDate" type="date" /></label>{employeeError && <p className="form-error" role="alert">{employeeError}</p>}<div className="form-actions"><button type="button" className="secondary-button" onClick={() => setEmployeeOpen(false)}>Cancelar</button><button className="primary-button" type="submit">Guardar persona</button></div></form></section></div>}
     </main>
   );
 }

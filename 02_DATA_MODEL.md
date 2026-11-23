@@ -10,7 +10,7 @@ Los nombres son orientativos; el agente debe convertirlos a modelos Prisma y gen
 
 ## Empresas y empleados
 - `Company`: tenantId, CUIT normalizado, razón social, domicilio, serviceType, fiscalYearEndMonth, fiscalYearEndDay, status.
-- `Employee`: companyId, CUIL normalizado, nombre, categoría, fechaIngreso, fechaBaja, status.
+- `Employee`: companyId, CUIL normalizado, nombre, categoría, fechaIngreso, sueldoBásicoVigente, fechaBaja, status.
 - `EmployeeCompensationVersion`: employeeId, validFrom, validTo, sueldoBasico, porcentajes/importes configurados, adicionalConectividad, fuente/regla.
 - `PayrollPeriod`: companyId, year, month, status, closedAt.
 - `PayrollRun`: periodId, version, status, approvedBy, approvedAt.

@@ -18,7 +18,7 @@ const companyRow = {
 const employeeRow = {
   id: "employee-test", studio_id: "studio-test", company_id: "company-test",
   full_name: "Persona ficticia", cuil: "20000000001", category: "Administrativa",
-  start_date: "2026-01-10", active: true, created_at: "2026-01-01T00:00:00Z",
+  start_date: "2026-01-10", base_salary: 0, active: true, created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
 };
 
@@ -62,7 +62,13 @@ function createFakeSupabase(options: { authenticated?: boolean } = {}) {
             return { data: row, error: null };
           } }),
         }),
-        update: () => ({ eq: () => ({ eq: async () => ({ error: null }) }) }),
+        update: (values: unknown) => ({ eq: (_column: string, id: string) => ({ eq: async () => {
+          if (table === "companies") {
+            const company = rows.companies.find((row) => row.id === id);
+            if (company) Object.assign(company, values);
+          }
+          return { error: null };
+        } }) }),
       };
     }),
   };
@@ -100,6 +106,31 @@ describe("gestión de clientes en Supabase", () => {
     const peopleRow = await screen.findByText("Persona ficticia").then((element) => element.closest("tr"));
     expect(peopleRow).not.toBeNull();
     expect(within(peopleRow as HTMLElement).getByText("Administrativa")).not.toBeNull();
+    const companyTableRow = screen.getAllByRole("row").find((row) => row.textContent?.includes("Compañía ficticia"));
+    expect(companyTableRow).toBeDefined();
+    expect(within(companyTableRow as HTMLElement).getByText("Activa")).not.toBeNull();
+  });
+
+  it("pide confirmación para archivar y permite reactivar una empresa", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<Home />);
+    await screen.findByText("Todavía no hay empresas");
+    fireEvent.click(screen.getByRole("button", { name: /nueva empresa/i }));
+    fireEvent.change(screen.getByLabelText("Razón social"), { target: { value: "Compañía ficticia" } });
+    fireEvent.change(screen.getByLabelText("CUIT"), { target: { value: "30-00000000-7" } });
+    fireEvent.change(screen.getByLabelText("Domicilio fiscal"), { target: { value: "Domicilio de prueba" } });
+    fireEvent.change(screen.getByLabelText("Servicio"), { target: { value: "BALANCE" } });
+    fireEvent.change(screen.getByLabelText(/fecha de cierre/i), { target: { value: "2026-12-31" } });
+    fireEvent.click(screen.getByRole("button", { name: "Guardar empresa" }));
+    const archiveButton = await screen.findByRole("button", { name: "Archivar Compañía ficticia" });
+    fireEvent.click(archiveButton);
+    await screen.findByRole("button", { name: "Reactivar Compañía ficticia" });
+    expect(screen.getByText("Archivada")).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Reactivar Compañía ficticia" }));
+    await screen.findByRole("button", { name: "Archivar Compañía ficticia" });
+    expect(screen.getByText("Activa")).not.toBeNull();
+    expect(confirm).toHaveBeenCalledOnce();
+    confirm.mockRestore();
   });
 
   it("no inserta una empresa sin cierre de ejercicio para balance", async () => {

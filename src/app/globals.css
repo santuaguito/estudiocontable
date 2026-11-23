@@ -513,6 +513,7 @@ tbody tr:hover {
   background:transparent;
   padding:0;
   color:inherit
+  ;text-decoration:none
 }
 .company-avatar {
   width:31px;
@@ -567,6 +568,8 @@ tbody tr:hover {
   color:#9ca299;
   letter-spacing:2px
 }
+.row-action { border:1px solid #e5e9e3;background:#fff;color:#687067;border-radius:6px;padding:6px 8px;font-size:9px }
+.row-action:hover { background:#f5f8f4;color:#45694f }
 .people-section {
   margin-top:29px
 }
@@ -687,9 +690,118 @@ tbody tr:hover {
   border:0
 }
 
+.payroll-create,.payroll-workspace {
+  background:#fff;border:1px solid var(--line);border-radius:11px;padding:18px;margin-bottom:22px
+}
+.payroll-period-form { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end }
+.payroll-period-form label,.payroll-item-form label { display:grid;gap:6px;font-size:10px;font-weight:600;color:#4f564d }
+.payroll-period-form input,.payroll-period-form select,.payroll-item-form input,.payroll-item-form select { height:36px;min-width:0;border:1px solid #dfe4de;border-radius:7px;padding:0 9px;background:white;color:#343a33;font-size:11px }
+.payroll-period-form button { min-height:36px }
+.payroll-message,.payroll-success { margin:0 0 14px }
+.payroll-success { padding:10px;border-radius:7px;background:#eff7ef;color:#446c4a;font-size:11px }
+.status-pill { padding:6px 9px;border-radius:12px;background:#fbf3e4;color:#927139;font-size:10px }
+.status-pill.review { background:#edf2f9;color:#566f91 }
+.status-pill.approved { background:#eaf4e9;color:#426e45 }
+.payroll-columns { display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;align-items:start }
+.payroll-period-list,.slip-list { display:grid;gap:7px }
+.period-choice,.slip-choice { display:grid;gap:4px;text-align:left;padding:11px;border:1px solid #e8ebe6;border-radius:8px;background:#fff;color:#444b42 }
+.period-choice.chosen,.slip-choice.chosen { border-color:#9eb59d;background:#f5f9f4 }
+.period-choice strong,.slip-choice strong { font-size:11px }
+.period-choice small,.slip-choice small { color:#8b9289;font-size:9px }
+.period-choice span { color:#987c4d;font-size:9px }
+.payroll-detail { min-width:0;display:grid;grid-template-columns:145px minmax(0,1fr);gap:12px }
+.slip-editor { min-width:0 }
+.slip-toolbar { display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px }
+.slip-toolbar-actions,.section-heading-actions { display:flex;align-items:center;gap:12px }
+.slip-toolbar h3 { margin:7px 0 3px;font-size:16px }
+.slip-toolbar p { margin:0;color:#858c82;font-size:10px }
+.draft-stamp { display:inline-block;padding:4px 7px;border:1px solid #b88636;color:#9c6d22;font-weight:800;font-size:9px;letter-spacing:1px;transform:rotate(-2deg) }
+.receipt-paper { position:relative;overflow:hidden;border:1px solid #dfe4de;background:#fff;padding:22px;min-height:500px }
+.receipt-watermark { position:absolute;top:43%;left:8%;width:84%;text-align:center;transform:rotate(-23deg);font-size:25px;letter-spacing:4px;font-weight:800;color:#a8783020;pointer-events:none }
+.receipt-paper>header { text-align:center;border-bottom:1px solid #aeb6ac;padding-bottom:13px }
+.receipt-paper>header strong,.receipt-paper>header small { display:block }
+.receipt-paper>header small { margin-top:4px;color:#697168;font-size:9px }
+.receipt-paper>header h2 { margin:11px 0 0;font-size:13px;letter-spacing:.7px }
+.receipt-identity { display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:13px 0;border-bottom:1px solid #cfd5cc;font-size:9px;color:#6f766d }
+.receipt-identity strong { display:block;margin-top:3px;color:#2d332d;font-size:10px }
+.receipt-section { position:relative;margin-top:13px }
+.receipt-section-heading { display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px solid #dfe4de;padding-bottom:6px }
+.receipt-section h3,.receipt-cost-summary h3 { margin:0;font-size:10px;letter-spacing:.25px }
+.receipt-section-heading strong { font-size:10px }
+.receipt-section table { margin-top:4px }
+.receipt-section th { height:25px;background:transparent;padding:0 5px;font-size:8px }
+.receipt-section td { height:auto;min-height:28px;padding:6px 5px;font-size:9px }
+.receipt-empty { margin:7px 0;color:#92988f;font-size:9px }
+.remove-item { border:0;background:transparent;color:#a24b3d;font-size:9px }
+.remove-item:disabled { opacity:.55;cursor:wait }
+.receipt-net { border-top:2px solid #899486;padding:10px 0 }
+.receipt-net h3 { display:inline-block }
+.receipt-net>strong { float:right;font-size:13px }
+.receipt-net p { margin:5px 0 0;color:#8c928a;font-size:8px }
+.receipt-cost-summary { position:relative;margin-top:11px;padding:11px;border:1px solid #e0e5dd;border-radius:7px }
+.cost-items { display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:9px 0;font-size:8px;color:#6e756b }
+.cost-items span { display:flex;justify-content:space-between;gap:5px }
+.cost-items strong { color:#333a32 }
+.cost-chart { width:94px;height:94px;margin:8px auto;border-radius:50%;background:conic-gradient(#6e9871 0 18%,#9bb68e 18% 36%,#d5bd81 36% 54%,#8198ad 54% 72%,#c88c71 72% 88%,#d9ded5 88%);display:grid;place-items:center }
+.cost-chart i { width:48px;height:48px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;color:#7c837a;font-size:7px;font-style:normal }
+.receipt-cost-summary>small { display:block;text-align:center;color:#8d948b;font-size:7px }
+.receipt-footer { margin-top:13px;padding-top:8px;border-top:1px solid #dfe4de;text-align:center;color:#8d6d37;font-size:8px }
+.payroll-item-form { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px;padding:13px;background:#f8faf7;border-radius:8px }
+.payroll-item-form h3 { grid-column:1/-1;margin:0;font-size:12px }
+.cost-category-field { display:none!important }
+.payroll-item-form:has(select[name="itemType"] option:checked[value="employer_contribution"]) .cost-category-field { display:grid!important }
+.payroll-item-form button { align-self:end;min-height:36px }
+.review-actions { margin-top:12px;padding:12px;background:#f8faf7;border-radius:8px }
+.review-actions p { margin:7px 0 0;color:#7e867b;font-size:9px }
+.review-actions p:first-of-type { color:#846c43 }
+.company-services,.company-module-grid { background:#fff;border:1px solid var(--line);border-radius:11px;padding:18px;margin-bottom:20px }
+.service-settings { display:flex;align-items:center;gap:15px;flex-wrap:wrap }
+.service-settings label { display:grid;gap:6px;font-size:10px;font-weight:600;color:#4f564d }
+.service-settings select { min-width:230px;height:38px;border:1px solid #dfe4de;border-radius:7px;padding:0 10px;background:#fff;color:#343a33;font-size:11px }
+.service-settings>span { color:#8a9088;font-size:10px }
+.company-module-grid>h2 { margin:0 0 14px;font-size:16px }
+.module-cards { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px }
+.module-card { display:flex;flex-direction:column;min-height:150px;border:1px solid #e5e9e3;border-radius:9px;padding:15px;color:inherit;text-decoration:none;background:#fff }
+.module-card:hover { border-color:#b9cbb5;background:#fbfdfb }
+.module-icon { display:grid;place-items:center;width:31px;height:31px;border-radius:9px;background:#edf3ed;color:#587d61;font-size:17px;margin-bottom:11px }
+.module-card>strong { font-size:12px }
+.module-card p { margin:6px 0 13px;color:#858c82;font-size:10px;line-height:1.5 }
+.module-open { margin-top:auto;color:#54785a;font-size:10px;font-weight:700 }
+.module-disabled { opacity:.55;pointer-events:none }
+.company-employee-form { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 13px;padding:13px;background:#f8faf7;border-radius:8px }
+.company-employee-form label { display:grid;gap:5px;font-size:10px;font-weight:600 }
+.company-employee-form input,.company-employee-form select,.employee-profile-form input,.employee-profile-form select { height:35px;min-width:0;border:1px solid #dfe4de;border-radius:7px;padding:0 9px;font-size:11px;background:#fff }
+.employee-profile-list { display:grid;gap:10px;margin-top:10px }
+.employee-profile-form { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end;padding:13px;background:#f8faf7;border:1px solid #e4e9e2;border-radius:8px }
+.employee-profile-form>strong { grid-column:1/-1;font-size:12px }
+.employee-profile-form label { display:grid;gap:5px;font-size:10px;font-weight:600 }
+.employee-profile-form .employee-checkbox,.company-employee-form .employee-checkbox { display:flex;align-items:center;gap:7px }
+.employee-profile-form .employee-checkbox input,.company-employee-form .employee-checkbox input { width:15px;height:15px }
+.employee-profile-form button { min-height:35px }
+.company-employee-form .field-hint { grid-column:1/-1;margin:0;font-size:10px;color:#697267 }
+.employer-rates-form { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;padding:13px;background:#f8faf7;border:1px solid #e4e9e2;border-radius:8px }
+.employer-rates-form h3,.employer-rates-form small { grid-column:1/-1;margin:0 }
+.employer-rates-form h3 { font-size:12px }
+.employer-rates-form label { display:grid;gap:5px;font-size:10px;font-weight:600 }
+.employer-rates-form input,.employer-rates-form select { height:35px;min-width:0;border:1px solid #dfe4de;border-radius:7px;padding:0 9px;font-size:11px;background:#fff }
+.employer-rates-form button { align-self:end;min-height:35px }
+.employer-rates-form small { color:#697267;font-size:10px }
+.company-employee-form .form-error { grid-column:1/-1 }
+.company-employee-form button { align-self:end;min-height:35px }
+
 @media(max-width:1050px) {
   .sidebar {
   width:210px
+}
+
+@media(max-width:900px) {
+  .payroll-period-form { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .payroll-detail { grid-template-columns:1fr }
+  .slip-list { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .module-cards { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .company-employee-form { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .employee-profile-form { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .employer-rates-form { grid-template-columns:1fr }
 }
 .workspace {
   margin-left:210px
@@ -714,6 +826,19 @@ tbody tr:hover {
   .sidebar {
   width:58px;
   padding:18px 8px
+}
+
+@media print {
+  @page { size:A4;margin:14mm }
+  body { background:#fff!important }
+  .sidebar,.topbar,.page-heading,.demo-notice,.payroll-create,.payroll-workspace>.section-heading,.payroll-period-list,.slip-list,.slip-toolbar,.payroll-item-form,.review-actions,.page-footer,.no-print { display:none!important }
+  .workspace { margin:0!important }
+  .page-content { max-width:none!important;padding:0!important }
+  .payroll-workspace { border:0!important;padding:0!important;margin:0!important }
+  .payroll-columns,.payroll-detail { display:block!important }
+  .receipt-paper { border:1px solid #aaa!important;min-height:0!important;padding:13mm!important;break-inside:avoid }
+  .receipt-watermark { color:#a8783030!important }
+  .receipt-section,.receipt-cost-summary { break-inside:avoid }
 }
 .brand {
   padding:0 3px 32px
@@ -758,6 +883,7 @@ tbody tr:hover {
 .page-heading h1 {
   font-size:24px
 }
+  .module-cards { grid-template-columns:1fr }
 .page-heading p {
   max-width:190px;
   line-height:1.5

@@ -61,6 +61,14 @@ Las altas se guardan en Supabase y el acceso a filas se limita mediante RLS por 
 - `06_UI_UX.md`: pantallas, navegación y estados.
 - `07_RELEASE_CHECKLIST.md`: checklist previo a producción.
 
+## Estado actual del módulo de sueldos
+
+La sección **Sueldos** genera borradores con escala FAECYS Acuerdo 10/2026, antigüedad, presentismo y tasas sindicales configuradas. También estima aportes y costos patronales con parámetros informados por empresa y una marca RIFL por persona que debe confirmarse previamente en ARCA. Los recibos individuales se pueden quitar de un período borrador; también se puede eliminar el período completo. La estimación no reemplaza la liquidación profesional ni el F.931.
+
+La solicitud de revisión cambia el estado a **En revisión** y queda visible en la lista de períodos compartida por los miembros del estudio. Un miembro con rol **contador** o **propietario** puede aceptar cada recibo desde la pantalla; se registran la cuenta y la fecha. El recibo aprobado queda bloqueado y se descarga como PDF final del estudio. No se envían correos, ni se registran firma o pago.
+
+El flujo parte de la ficha individual de cada empresa (`/companies/{id}`). Allí se configuran por persona categoría CCT 130/75, jornada, antigüedad, presentismo y porcentajes sindicales/solidarios. Por empresa se configuran las alícuotas ARCA, FAL y ART. El borrador se genera para períodos de noviembre de 2026 a mayo de 2027. Sueldos requiere empresa activa, servicio “Sueldos” o “Sueldos y contabilidad”, perfiles completos, parámetros patronales y las siete migraciones aplicadas en orden (`20261122000000` a `20261128000000`).
+
 ## Advertencias de alcance
 
 - La aplicación es una herramienta de apoyo profesional; no reemplaza la revisión del contador.

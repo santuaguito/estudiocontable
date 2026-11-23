@@ -6,11 +6,19 @@
 - No asumir que la validación matemática confirma existencia o situación fiscal ante ARCA.
 
 ## 2. Liquidación de sueldos
+- El borrador usa la escala FAECYS Acuerdo 10/2026, categoría de CCT 130/75, jornada semanal y antigüedad reconocida. Los importes y el perfil vigente quedan congelados en el recibo.
+- La escala disponible cubre noviembre de 2026 a mayo de 2027. No se extrapolan períodos fuera de esa vigencia.
+- Antigüedad: 1% por año sobre remuneraciones y sumas no remunerativas recurrentes, excluida la suma única de octubre 2026. Presentismo: 1/12 de los importes remunerativos y no remunerativos alcanzados, excluida la suma única; su elegibilidad se informa para el período y requiere revisión de asistencia.
+- Suma no remunerativa recurrente y suma única se aplican según tabla FAECYS vigente y se prorratean por jornada en los casos soportados.
+- Los aportes sindicales y solidarios se calculan sobre la base configurada con las tasas de legajo. La tasa predeterminada sindical refleja el artículo 100 del CCT y puede verificarse/modificarse antes de calcular.
+- Aportes personales, contribuciones patronales, FAL, ART y obra social se muestran como estimaciones parametrizadas. Para la empresa se configura ARCA (18% o 20,4%), FAL y la alícuota contractual de ART; el perfil individual puede marcar RIFL solo tras confirmar elegibilidad en ARCA. La regla RIFL se limita a fechas de ingreso entre 01/05/2026 y 30/04/2027 y a los primeros 48 meses, pero no comprueba todas las condiciones legales del beneficio.
+- La contribución general ARCA se conserva agregada en “Seguridad social” porque la tasa configurable no permite reconstruir por sí sola el detalle de subsistemas del F.931. En RIFL se muestran separadas las tasas programadas de 2% y 3% INSSJP. Bases imponibles, topes, ART fijo, regímenes, licencias, ausencias, diferencias zonales y demás excepciones requieren validación profesional; el borrador no sustituye F.931 ni recibo legal.
 - Los conceptos se definen mediante catálogo y reglas con vigencia.
-- Sindicato, cuota solidaria/promoción social y conectividad son conceptos configurables: no asumir si son remunerativos, no remunerativos, imponibles o deducibles.
+- Sindicato y cuota solidaria/promoción social se configuran como tasas de deducción; no se admite ingresar importes arbitrarios desde la pantalla del recibo.
+- Un miembro con rol `accountant` o `owner` puede aprobar recibos individuales; se congela la edición y se registra el usuario y fecha de aprobación. El período pasa a finalizado al aprobarse todos los recibos.
 - Cada concepto debe especificar: naturaleza, base, porcentaje/importe, límites, vigencia, convenio/categoría, redondeo y quién lo aprobó.
 - Los cambios de sueldo/categoría deben tener vigencia y no modificar recibos históricos.
-- El sistema no debe inferir automáticamente convenio colectivo, escala salarial o porcentajes legales.
+- El sistema requiere selección explícita del CCT/categoría y configuración de alícuotas patronales antes de crear el borrador; no deduce convenio desde el puesto ni completa tasas legales faltantes.
 - El contador revisa y aprueba la liquidación antes de emitir.
 - Las reglas legales se deben revisar con normativa vigente y asesoramiento profesional.
 

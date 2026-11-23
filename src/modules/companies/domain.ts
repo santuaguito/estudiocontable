@@ -17,6 +17,7 @@ export type Employee = {
   cuil: string;
   category: string;
   startDate: string;
+  baseSalary: number;
   active: boolean;
 };
 
@@ -99,7 +100,17 @@ export function validateEmployee(
   }
   if (!input.category.trim()) errors.push("Ingresá la categoría o calificación profesional.");
   if (!input.startDate) errors.push("Ingresá la fecha de ingreso.");
+  if (!Number.isFinite(input.baseSalary) || input.baseSalary < 0 || Math.round(input.baseSalary * 100) !== input.baseSalary * 100) {
+    errors.push("Ingresá un sueldo básico no negativo con hasta dos decimales.");
+  }
   return errors;
+}
+
+export function parseBaseSalary(value: string): number | null {
+  const normalized = value.trim().replace(/\s/g, "").replace(/\.(?=\d{3}(?:\D|$))/g, "").replace(",", ".");
+  if (!/^(?:\d+)(?:\.\d{1,2})?$/.test(normalized)) return null;
+  const amount = Number(normalized);
+  return Number.isFinite(amount) && amount >= 0 ? Math.round(amount * 100) / 100 : null;
 }
 
 export function formatIdentifier(value: string): string {
