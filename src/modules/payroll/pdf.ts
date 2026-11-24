@@ -103,13 +103,43 @@ function categoryOf(item: ReceiptPdfItem): Cat {
   if (direct) return direct;
   const d = strip(item.description);
   if (/sindical|solidaria|promocion social|faecys/.test(d)) return "Sindical";
-  if (/inssjp|19032|pami/.test(d)) return "INSSJP";
+  if (/inssjp|i\.n\.s\.s\.j\.p|19032|pami/.test(d)) return "INSSJP";
   if (/obra social|osecac/.test(d)) return "Obra social";
   if (/jubilacion|sipa|anses|fondo nacional|seguridad social|asig/.test(d)) return "Seguridad social";
   if (/\bart\b|a\.r\.t/.test(d)) return "ART";
   if (/scvo|seguro.*vida/.test(d)) return "SCVO";
   if (/camara/.test(d)) return "Cámaras";
   return "Otros";
+}
+
+
+// ── Descuentos del trabajador: tasa fija que se muestra entre paréntesis y se aplica sobre la base ──
+const DEDUCTION_RULES: { test: RegExp; label: string; rate: number; base: "remunerative" | "gross" }[] = [
+  { test: /jubilaci/i, label: "Jubilación", rate: 11, base: "remunerative" },
+  { test: /inssjp|i\.n\.s\.s\.j\.p|19032|pami/i, label: "I.N.S.S.J.P.", rate: 3, base: "remunerative" },
+  { test: /obra\s+social/i, label: "Obra social", rate: 3, base: "gross" },
+  { test: /(cuota|aporte)\s+sindical/i, label: "Cuota sindical", rate: 1.5, base: "gross" },
+];
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+function applyDeductionRates(items: ReceiptPdfItem[], remunerativeTotal: number, gross: number): { items: ReceiptPdfItem[]; applied: boolean } {
+  let applied = false;
+  const out = items.map((item) => {
+    const rule = DEDUCTION_RULES.find((r) => r.test.test(item.description));
+    if (!rule) return item;
+    applied = true;
+    const base = item.calculationBase ?? (rule.base === "gross" ? gross : remunerativeTotal);
+    const pct = String(rule.rate).replace(".", ",");
+    return {
+      ...item,
+      categoryLabel: item.categoryLabel ?? categoryOf(item),
+      description: `${rule.label} (${pct}%)`,
+      calculationBase: base,
+      quantity: item.quantity ?? rule.rate,
+      amount: round2((base * rule.rate) / 100),
+    };
+  });
+  return { items: out, applied };
 }
 
 function formatDate(v: string): string {
@@ -208,12 +238,15 @@ export async function createReceiptPdf(data: ReceiptPdfData): Promise<Uint8Array
   const sum = (xs: ReceiptPdfItem[]) => xs.reduce((s, i) => s + i.amount, 0);
   const contributions = data.items.filter((i) => i.itemType === "employer_contribution");
   const remunerations = data.items.filter((i) => i.itemType === "remuneration");
-  const deductions = data.items.filter((i) => i.itemType === "deduction");
+  const rawDeductions = data.items.filter((i) => i.itemType === "deduction");
   const isNonRem = (i: ReceiptPdfItem) => i.remunerative === false || (i.remunerative === undefined && /no\s+remunerativ/i.test(i.description));
   const remunerativeTotal = sum(remunerations.filter((i) => !isNonRem(i)));
   const nonRemTotal = sum(remunerations.filter(isNonRem));
   const gross = remunerativeTotal + nonRemTotal;
+  const { items: deductions, applied: ratesApplied } = applyDeductionRates(rawDeductions, remunerativeTotal, gross);
   const deductionsTotal = sum(deductions);
+  // Si se aplicaron las tasas, el neto se recalcula para que cierre con los descuentos mostrados.
+  const netAmount = ratesApplied ? round2(gross - deductionsTotal) : data.netEstimate;
   const contributionsTotal = sum(contributions);
   const employerCost = gross + contributionsTotal;
 
@@ -401,7 +434,7 @@ export async function createReceiptPdf(data: ReceiptPdfData): Promise<Uint8Array
     box(netX, t, E.monto0 - netX, netH, GRAY);
     cell("SUELDO NETO", netX, E.monto0, t, netH, { font: bold, size: 8.5, align: "center" });
     box(E.monto0, t, R - E.monto0, netH);
-    cell(NUM.format(data.netEstimate), E.monto0, R, t, netH, { font: bold, size: 9, align: "right", pad: 7 });
+    cell(NUM.format(netAmount), E.monto0, R, t, netH, { font: bold, size: 9, align: "right", pad: 7 });
     t += netH;
 
     // Son pesos
@@ -409,7 +442,7 @@ export async function createReceiptPdf(data: ReceiptPdfData): Promise<Uint8Array
     const label = "Son Pesos: ";
     const labelW = regular.widthOfTextAtSize(label, 8.5);
     drawText(label, L + 4, t + 12.5, 8.5);
-    const words = fit(amountInWords(data.netEstimate), regular, 8.5, W - labelW - 12);
+    const words = fit(amountInWords(netAmount), regular, 8.5, W - labelW - 12);
     drawText(words, L + 4 + labelW, t + 12.5, 8.5);
     const wordsEnd = L + 4 + labelW + regular.widthOfTextAtSize(words, 8.5);
     if (wordsEnd + 10 < L + 405) line(wordsEnd + 6, t + 14.5, L + 405, t + 14.5, 0.5);
@@ -438,7 +471,7 @@ export async function createReceiptPdf(data: ReceiptPdfData): Promise<Uint8Array
     const legend: { name: string; color: string; value: number }[] = PIE_ORDER
       .filter((c) => BASE_CATEGORIES.includes(c) || emp[c] + wrk[c] !== 0)
       .map((c) => ({ name: LEGEND_NAME[c], color: CAT_COLORS[c], value: emp[c] + wrk[c] }));
-    legend.push({ name: "Sueldo Neto", color: CAT_COLORS.Neto, value: Math.max(data.netEstimate, 0) });
+    legend.push({ name: "Sueldo Neto", color: CAT_COLORS.Neto, value: Math.max(netAmount, 0) });
     const pieTotal = legend.reduce((s, e) => s + Math.max(e.value, 0), 0);
     drawTextCenter("Costo Total del Empleador", L + 442, dTop + 14, 9, bold);
     drawPie(legend.map((e) => e.value), legend.map((e) => e.color), L + 392, dTop + 68, 32);
